@@ -72,3 +72,4 @@ class Log():
     #     self.queue.put(('error',value))
 log_level = logging.DEBUG if Conf.get('DEFAULT','mode')=='debug' else logging.ERROR
 logger = Log('log/server',log_level).logger
+# client_logger = Log('log/client',log_level).logger # 不知道为什么会和上面的logger重复

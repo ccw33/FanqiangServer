@@ -93,6 +93,20 @@ def get_pac():
         # return Response("服务器出错，请联系管理员，请求id是：%s" % request_id,status=500)
         abort(500)
 
+@app.route('/get_client_error', methods=['GET'])
+def get_client_error():
+    '''
+    获取有用的ip_port
+    :return:
+    '''
+    try:
+        data = request.args.to_dict()
+        account = data['account']
+        error = data['error']
+        logger.error('Client Error : {0}------{1}--------{2}'.format(account,request.environ['REMOTE_ADDR'],error))
+        return Response(status=200)
+    except Exception:
+        logger.error(traceback.format_exc())
 
 @app.route('/get_ip_port', methods=['GET', 'POST', 'PUT', 'PATCH'])
 def get_ip_port():
@@ -206,6 +220,6 @@ if __name__ == '__main__':
         update_pool_thread = threading.Thread(target=get_ip_port_to_pool)
         update_pool_thread.start()
         # app.debug=True
-        app.run(host='0.0.0.0', port='5082')
+        app.run(host='0.0.0.0', port='5082',use_reloader=False)
         # app.run(host='0.0.0.0', port='5082',ssl_context='adhoc')
-        # update_pool_thread.join()
+        update_pool_thread.join()
