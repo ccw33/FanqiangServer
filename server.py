@@ -189,7 +189,17 @@ def get_ip_port_to_pool():
                 logger.debug('pool数量{0}达不到要求的{1}'.format(len(cache.ip_port_pool), Conf.get('IP_PORT_POOL', 'bak_num')))
                 ip_port_list = pickle.loads(fanqiang_service_client.run(
                     Transformer().FanqiangService().get_useful_fanqiang_ip_port_from_mongo(new_num).done()).data)
+
                 cache.ip_port_pool.extend(ip_port_list)
+                # ------------去重------------
+                ip_port_map = {}
+                for ip_port_dict in cache.ip_port_pool:
+                    ip_port_map[ip_port_dict['ip_with_port']] = ip_port_dict
+                new_ip_list = []
+                for ip_port_dict in ip_port_map.values():
+                    new_ip_list.append(ip_port_dict)
+                cache.ip_port_pool = new_ip_list
+                # ------------去重------------
             else:
                 new_num -= 1
             # 把能用的写到文件里面
@@ -207,6 +217,7 @@ def get_ip_port_to_pool():
     except Exception:
         logger.error(traceback.format_exc())
         logger.error('get_ip_port_to_pool  线程错误关闭')
+        get_ip_port_to_pool()
 
 
 if __name__ == '__main__':
